@@ -9,7 +9,6 @@ dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 import app from './app.js';
 import { initNotificationService } from './services/notificationService.js';
-import { preloadModel } from './services/embeddingService.js';
 import { initDB } from './db/init.js';
 import jwt from 'jsonwebtoken';
 
@@ -75,11 +74,6 @@ server.listen(PORT, () => {
   // Auto-initialize DB schema if tables do not exist
   initDB().catch((err) => {
     console.log('ℹ️ DB init notice:', err.message);
-  });
-
-  // Preload AI model in background (don't block startup)
-  preloadModel().catch(() => {
-    console.log('⚠️ AI model will load on first search request');
   });
 });
 

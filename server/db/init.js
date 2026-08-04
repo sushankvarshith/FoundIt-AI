@@ -28,4 +28,6 @@ export async function initDB() {
 }
 
 // Execute if run directly via node db/init.js
-initDB();
+if (process.argv[1] && (process.argv[1].endsWith('init.js') || process.argv[1].endsWith('init'))) {
+  initDB();
+}
