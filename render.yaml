@@ -7,7 +7,7 @@ services:
     plan: free
     buildCommand: |
       cd server && npm install
-      cd ../client && npm install && npm run build
+      cd ../client && npm install --include=dev && npm run build
     startCommand: cd server && node server.js
     envVars:
       - key: NODE_ENV

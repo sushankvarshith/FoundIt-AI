@@ -10,7 +10,7 @@
     "install:all": "cd server && npm install && cd ../client && npm install",
     "build:client": "cd client && npm run build",
     "start": "cd server && node server.js",
-    "render:build": "cd server && npm install && cd ../client && npm install && npm run build",
+    "render:build": "cd server && npm install && cd ../client && npm install --include=dev && npm run build",
     "render:start": "cd server && node server.js"
   },
   "keywords": ["lost-and-found", "ai", "image-search", "clip"],
