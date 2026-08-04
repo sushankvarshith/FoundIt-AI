@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 -- ============================================
 -- USERS
 -- ============================================
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR(100) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE users (
 -- ============================================
 -- ITEMS (Found Items)
 -- ============================================
-CREATE TABLE items (
+CREATE TABLE IF NOT EXISTS items (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title VARCHAR(200) NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE items (
 -- ============================================
 -- ITEM IMAGES
 -- ============================================
-CREATE TABLE item_images (
+CREATE TABLE IF NOT EXISTS item_images (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
   image_url TEXT NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE item_images (
 -- ============================================
 -- IMAGE EMBEDDINGS (pgvector)
 -- ============================================
-CREATE TABLE embeddings (
+CREATE TABLE IF NOT EXISTS embeddings (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
   image_id UUID NOT NULL REFERENCES item_images(id) ON DELETE CASCADE,
@@ -72,7 +72,7 @@ CREATE TABLE embeddings (
 -- ============================================
 -- LIKES
 -- ============================================
-CREATE TABLE likes (
+CREATE TABLE IF NOT EXISTS likes (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
@@ -83,7 +83,7 @@ CREATE TABLE likes (
 -- ============================================
 -- COMMENTS (threaded)
 -- ============================================
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
@@ -96,7 +96,7 @@ CREATE TABLE comments (
 -- ============================================
 -- BOOKMARKS
 -- ============================================
-CREATE TABLE bookmarks (
+CREATE TABLE IF NOT EXISTS bookmarks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
@@ -107,7 +107,7 @@ CREATE TABLE bookmarks (
 -- ============================================
 -- CLAIM REQUESTS
 -- ============================================
-CREATE TABLE claim_requests (
+CREATE TABLE IF NOT EXISTS claim_requests (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
   claimant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -122,7 +122,7 @@ CREATE TABLE claim_requests (
 -- ============================================
 -- NOTIFICATIONS
 -- ============================================
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   type VARCHAR(50) NOT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE notifications (
 -- ============================================
 -- REPORTS
 -- ============================================
-CREATE TABLE reports (
+CREATE TABLE IF NOT EXISTS reports (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   reporter_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
@@ -150,7 +150,7 @@ CREATE TABLE reports (
 -- ============================================
 -- SHARES
 -- ============================================
-CREATE TABLE shares (
+CREATE TABLE IF NOT EXISTS shares (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
@@ -161,7 +161,7 @@ CREATE TABLE shares (
 -- ============================================
 -- MESSAGES (in-app chat)
 -- ============================================
-CREATE TABLE messages (
+CREATE TABLE IF NOT EXISTS messages (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -174,37 +174,37 @@ CREATE TABLE messages (
 -- ============================================
 -- INDEXES
 -- ============================================
-CREATE INDEX idx_items_user ON items(user_id);
-CREATE INDEX idx_items_category ON items(category);
-CREATE INDEX idx_items_status ON items(status);
-CREATE INDEX idx_items_created ON items(created_at DESC);
-CREATE INDEX idx_items_location ON items(location_found);
-CREATE INDEX idx_items_color ON items(color);
-CREATE INDEX idx_items_brand ON items(brand);
+CREATE INDEX IF NOT EXISTS idx_items_user ON items(user_id);
+CREATE INDEX IF NOT EXISTS idx_items_category ON items(category);
+CREATE INDEX IF NOT EXISTS idx_items_status ON items(status);
+CREATE INDEX IF NOT EXISTS idx_items_created ON items(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_items_location ON items(location_found);
+CREATE INDEX IF NOT EXISTS idx_items_color ON items(color);
+CREATE INDEX IF NOT EXISTS idx_items_brand ON items(brand);
 
-CREATE INDEX idx_item_images_item ON item_images(item_id);
-CREATE INDEX idx_embeddings_item ON embeddings(item_id);
-CREATE INDEX idx_embeddings_image ON embeddings(image_id);
+CREATE INDEX IF NOT EXISTS idx_item_images_item ON item_images(item_id);
+CREATE INDEX IF NOT EXISTS idx_embeddings_item ON embeddings(item_id);
+CREATE INDEX IF NOT EXISTS idx_embeddings_image ON embeddings(image_id);
 
-CREATE INDEX idx_likes_item ON likes(item_id);
-CREATE INDEX idx_likes_user ON likes(user_id);
+CREATE INDEX IF NOT EXISTS idx_likes_item ON likes(item_id);
+CREATE INDEX IF NOT EXISTS idx_likes_user ON likes(user_id);
 
-CREATE INDEX idx_comments_item ON comments(item_id);
-CREATE INDEX idx_comments_parent ON comments(parent_id);
+CREATE INDEX IF NOT EXISTS idx_comments_item ON comments(item_id);
+CREATE INDEX IF NOT EXISTS idx_comments_parent ON comments(parent_id);
 
-CREATE INDEX idx_bookmarks_user ON bookmarks(user_id);
+CREATE INDEX IF NOT EXISTS idx_bookmarks_user ON bookmarks(user_id);
 
-CREATE INDEX idx_claim_requests_item ON claim_requests(item_id);
-CREATE INDEX idx_claim_requests_claimant ON claim_requests(claimant_id);
+CREATE INDEX IF NOT EXISTS idx_claim_requests_item ON claim_requests(item_id);
+CREATE INDEX IF NOT EXISTS idx_claim_requests_claimant ON claim_requests(claimant_id);
 
-CREATE INDEX idx_notifications_user ON notifications(user_id, is_read);
-CREATE INDEX idx_notifications_created ON notifications(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_read);
+CREATE INDEX IF NOT EXISTS idx_notifications_created ON notifications(created_at DESC);
 
-CREATE INDEX idx_messages_sender ON messages(sender_id);
-CREATE INDEX idx_messages_receiver ON messages(receiver_id, is_read);
+CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
+CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id, is_read);
 
-CREATE INDEX idx_reports_status ON reports(status);
+CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
 
 -- HNSW index for fast vector similarity search
-CREATE INDEX idx_embeddings_vector ON embeddings
+CREATE INDEX IF NOT EXISTS idx_embeddings_vector ON embeddings
   USING hnsw (embedding vector_cosine_ops);
