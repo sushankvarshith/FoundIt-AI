@@ -33,14 +33,7 @@ services:
       - key: EMAIL_PASS
         sync: false
 
-  # PostgreSQL Database with pgvector
-  - type: pserv
-    name: findit-db
-    runtime: image
-    image:
-      url: ankane/pgvector:latest
+databases:
+  - name: findit-db
     plan: free
-    disk:
-      name: pgdata
-      mountPath: /var/lib/postgresql/data
-      sizeGB: 1
+    region: oregon
