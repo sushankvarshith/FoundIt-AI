@@ -70,6 +70,8 @@ server.listen(PORT, () => {
   ║   Environment: ${process.env.NODE_ENV || 'development'}            ║
   ║                                           ║
   ╚═══════════════════════════════════════════╝
+  `);
+
   // Auto-initialize DB schema if tables do not exist
   initDB().catch((err) => {
     console.log('ℹ️ DB init notice:', err.message);
