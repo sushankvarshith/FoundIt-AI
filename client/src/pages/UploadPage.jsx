@@ -49,7 +49,15 @@ export default function UploadPage() {
     if (!form.title.trim()) return toast.error('Title is required');
 
     setUploading(true);
-    setProgress(10);
+    setProgress(0);
+
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 90) return prev;
+        const increment = prev < 50 ? 5 : prev < 80 ? 2 : 0.5;
+        return prev + increment;
+      });
+    }, 200);
 
     try {
       const formData = new FormData();
@@ -58,16 +66,19 @@ export default function UploadPage() {
         if (val !== '' && val !== undefined) formData.append(key, val);
       });
 
-      setProgress(30);
       const res = await itemService.create(formData);
+      
+      clearInterval(progressInterval);
       setProgress(100);
 
       toast.success('Item uploaded successfully! 🎉');
       setTimeout(() => navigate(`/items/${res.data.id}`), 500);
     } catch (err) {
+      clearInterval(progressInterval);
+      setProgress(0);
       toast.error(err.response?.data?.error || 'Upload failed');
     } finally {
-      setUploading(false);
+      setTimeout(() => setUploading(false), 500);
     }
   };
 
@@ -88,16 +99,27 @@ export default function UploadPage() {
 
         {/* Progress Steps */}
         <div className="flex items-center justify-center gap-2 mb-10">
-          {[1, 2, 3].map(s => (
-            <div key={s} className="flex items-center gap-2">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
-                step >= s
-                  ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25'
-                  : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
-              }`}>
-                {step > s ? <HiOutlineCheck size={20} /> : s}
+          {[
+            { id: 1, label: 'Images' },
+            { id: 2, label: 'Details' },
+            { id: 3, label: 'Contact' }
+          ].map((s, index, array) => (
+            <div key={s.id} className="flex items-center gap-2">
+              <div className="flex flex-col items-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
+                  step >= s.id
+                    ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25'
+                    : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                }`}>
+                  {step > s.id ? <HiOutlineCheck size={20} /> : s.id}
+                </div>
+                <span className={`text-xs mt-2 font-medium hidden sm:block ${step >= s.id ? 'text-primary-600 dark:text-primary-400' : 'text-slate-400'}`}>
+                  {s.label}
+                </span>
               </div>
-              {s < 3 && <div className={`w-12 sm:w-20 h-0.5 ${step > s ? 'bg-primary-500' : 'bg-slate-200 dark:bg-slate-700'}`} />}
+              {index < array.length - 1 && (
+                <div className={`w-12 sm:w-20 h-0.5 sm:mb-6 ${step > s.id ? 'bg-primary-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+              )}
             </div>
           ))}
         </div>
@@ -240,8 +262,8 @@ export default function UploadPage() {
                 {uploading && (
                   <div className="mt-6">
                     <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 mb-2">
-                      <span>Uploading...</span>
-                      <span>{progress}%</span>
+                      <span>Uploading and analyzing image with AI...</span>
+                      <span>{Math.round(progress)}%</span>
                     </div>
                     <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                       <motion.div

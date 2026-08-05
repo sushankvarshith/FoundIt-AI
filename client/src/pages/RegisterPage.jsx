@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { HiOutlineMail, HiOutlineLockClosed, HiOutlineUser } from 'react-icons/hi';
+import { HiOutlineMail, HiOutlineLockClosed, HiOutlineUser, HiOutlineCheck, HiOutlineX } from 'react-icons/hi';
 import { useAuth } from '../context/AuthContext';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -22,7 +22,7 @@ export default function RegisterPage() {
     if (!form.name) newErrors.name = 'Name is required';
     if (!form.email) newErrors.email = 'Email is required';
     if (!form.password) newErrors.password = 'Password is required';
-    else if (form.password.length < 6) newErrors.password = 'Min 6 characters';
+    else if (form.password.length < 8) newErrors.password = 'Min 8 characters';
     if (form.password !== form.confirmPassword) newErrors.confirmPassword = 'Passwords don\'t match';
 
     if (Object.keys(newErrors).length) return setErrors(newErrors);
@@ -39,22 +39,12 @@ export default function RegisterPage() {
     }
   };
 
-  // Password strength
-  const getStrength = (pwd) => {
-    if (!pwd) return { level: 0, label: '', color: '' };
-    let score = 0;
-    if (pwd.length >= 6) score++;
-    if (pwd.length >= 10) score++;
-    if (/[A-Z]/.test(pwd)) score++;
-    if (/[0-9]/.test(pwd)) score++;
-    if (/[^A-Za-z0-9]/.test(pwd)) score++;
-    if (score <= 2) return { level: score, label: 'Weak', color: 'bg-rose-400' };
-    if (score <= 3) return { level: score, label: 'Fair', color: 'bg-amber-400' };
-    if (score <= 4) return { level: score, label: 'Strong', color: 'bg-emerald-400' };
-    return { level: score, label: 'Very Strong', color: 'bg-emerald-500' };
-  };
-
-  const strength = getStrength(form.password);
+  const passwordReqs = [
+    { label: 'At least 8 characters', met: form.password.length >= 8 },
+    { label: 'One uppercase letter', met: /[A-Z]/.test(form.password) },
+    { label: 'One number', met: /[0-9]/.test(form.password) },
+    { label: 'One special character', met: /[^A-Za-z0-9]/.test(form.password) }
+  ];
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-20">
@@ -114,15 +104,20 @@ export default function RegisterPage() {
                 error={errors.password}
               />
               {form.password && (
-                <div className="mt-2">
-                  <div className="flex gap-1 mb-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <div key={i} className={`h-1 flex-1 rounded-full ${i < strength.level ? strength.color : 'bg-slate-200 dark:bg-slate-700'}`} />
-                    ))}
-                  </div>
-                  <p className={`text-xs ${strength.level <= 2 ? 'text-rose-400' : strength.level <= 3 ? 'text-amber-400' : 'text-emerald-400'}`}>
-                    {strength.label}
-                  </p>
+                <div className="mt-3 space-y-2 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Password Requirements:</p>
+                  {passwordReqs.map((req, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs">
+                      {req.met ? (
+                        <HiOutlineCheck className="text-emerald-500 flex-shrink-0" size={14} />
+                      ) : (
+                        <HiOutlineX className="text-slate-400 flex-shrink-0" size={14} />
+                      )}
+                      <span className={req.met ? 'text-slate-700 dark:text-slate-300 font-medium' : 'text-slate-500'}>
+                        {req.label}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

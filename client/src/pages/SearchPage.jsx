@@ -150,14 +150,29 @@ export default function SearchPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="relative rounded-2xl overflow-hidden">
-                  <img src={preview} alt="Search" className="w-full max-h-80 object-contain bg-slate-100 dark:bg-slate-800 rounded-2xl" />
-                  <button
-                    onClick={() => { setSearchImage(null); setPreview(null); }}
-                    className="absolute top-3 right-3 p-2 rounded-xl bg-black/50 text-white hover:bg-black/70 transition-colors"
-                  >
-                    <HiOutlineX size={18} />
-                  </button>
+                <div className="relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center min-h-[200px] max-h-[400px] border border-slate-200 dark:border-slate-800">
+                  <img src={preview} alt="Search" className="max-w-full max-h-[400px] object-contain" />
+                  
+                  {loading && (
+                    <>
+                      <div className="absolute inset-0 bg-primary-500/10 backdrop-blur-[2px] z-0" />
+                      <motion.div
+                        initial={{ top: '0%' }}
+                        animate={{ top: '100%' }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                        className="absolute left-0 right-0 h-1 bg-primary-500 shadow-[0_0_20px_5px_rgba(99,102,241,0.5)] z-10"
+                      />
+                    </>
+                  )}
+
+                  {!loading && (
+                    <button
+                      onClick={() => { setSearchImage(null); setPreview(null); }}
+                      className="absolute top-3 right-3 p-2 rounded-xl bg-black/50 text-white hover:bg-black/70 transition-colors z-20"
+                    >
+                      <HiOutlineX size={18} />
+                    </button>
+                  )}
                 </div>
                 <Button
                   variant="gradient"
@@ -260,10 +275,11 @@ export default function SearchPage() {
             <Button variant="ghost" size="sm" onClick={clearSearch}>Clear</Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {results.map(item => (
+            {results.map((item, index) => (
               <ItemCard
                 key={item.id}
                 item={item}
+                index={index}
                 similarity={mode === 'image' ? item.similarity : null}
               />
             ))}

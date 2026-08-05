@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { HiOutlineSearch, HiOutlineUpload, HiOutlinePhotograph, HiOutlineArrowRight, HiOutlineSparkles, HiOutlineRefresh } from 'react-icons/hi';
 import { itemService } from '../services/services';
 import ItemCard from '../components/items/ItemCard';
@@ -10,7 +10,44 @@ import Button from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
 import { useInfiniteScroll } from '../hooks/useHooks';
 
-const categories = ['Phone', 'Wallet', 'Keys', 'ID Card', 'Bag', 'Watch', 'Laptop', 'Headphones', 'Bottle', 'Other'];
+const categories = [
+  { name: 'Phone', icon: '📱' },
+  { name: 'Wallet', icon: '👛' },
+  { name: 'Keys', icon: '🔑' },
+  { name: 'ID Card', icon: '🪪' },
+  { name: 'Bag', icon: '🎒' },
+  { name: 'Watch', icon: '⌚' },
+  { name: 'Laptop', icon: '💻' },
+  { name: 'Headphones', icon: '🎧' },
+  { name: 'Bottle', icon: '💧' },
+  { name: 'Other', icon: '📦' },
+];
+
+function AnimatedNumber({ value }) {
+  const nodeRef = useRef(null);
+  const isInView = useInView(nodeRef, { once: true });
+  
+  useEffect(() => {
+    if (!isInView || !nodeRef.current) return;
+    const numericValue = parseInt(value.replace(/[^0-9]/g, ''));
+    const suffix = value.replace(/[0-9]/g, '');
+    let startTime;
+    const duration = 2000;
+    
+    const updateCount = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      if (nodeRef.current) {
+        nodeRef.current.textContent = Math.floor(ease * numericValue) + suffix;
+      }
+      if (progress < 1) requestAnimationFrame(updateCount);
+    };
+    requestAnimationFrame(updateCount);
+  }, [value, isInView]);
+  
+  return <span ref={nodeRef}>0</span>;
+}
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -155,7 +192,9 @@ export default function HomePage() {
                     transition={{ delay: 0.3 + i * 0.1 }}
                     className="text-center"
                   >
-                    <div className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-white">
+                      <AnimatedNumber value={stat.value} />
+                    </div>
                     <div className="text-sm text-white/60">{stat.label}</div>
                   </motion.div>
                 ))}
@@ -172,30 +211,54 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* How it works */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 -mt-12 relative z-10">
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { icon: '📸', title: 'Snap a Photo', desc: 'Take a picture of the item you found or the one you lost.' },
+            { icon: '🧠', title: 'AI Matching', desc: 'Our AI instantly analyzes the image and finds visual matches.' },
+            { icon: '🤝', title: 'Reconnect', desc: 'Chat securely and reunite the item with its rightful owner.' },
+          ].map((step, i) => (
+            <motion.div
+              key={step.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="glass-card p-6 text-center gradient-border-card"
+            >
+              <div className="text-4xl mb-4">{step.icon}</div>
+              <h3 className="text-xl font-bold font-display text-slate-900 dark:text-white mb-2">{step.title}</h3>
+              <p className="text-slate-500 dark:text-slate-400">{step.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* Category Filters */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 mb-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
           <button
             onClick={() => setActiveCategory('')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 ${
               !activeCategory
                 ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25'
-                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary-300'
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary-300 hover:bg-slate-50 dark:hover:bg-slate-700'
             }`}
           >
-            All Items
+            <span>✨</span> All Items
           </button>
           {categories.map(cat => (
             <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                activeCategory === cat
+              key={cat.name}
+              onClick={() => setActiveCategory(cat.name)}
+              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 btn-ripple ${
+                activeCategory === cat.name
                   ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25'
-                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary-300'
+                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary-300 hover:bg-slate-50 dark:hover:bg-slate-700'
               }`}
             >
-              {cat}
+              <span>{cat.icon}</span> {cat.name}
             </button>
           ))}
         </div>
@@ -210,8 +273,8 @@ export default function HomePage() {
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {trending.slice(0, 4).map(item => (
-              <ItemCard key={item.id} item={item} />
+            {trending.slice(0, 4).map((item, index) => (
+              <ItemCard key={item.id} item={item} index={index} />
             ))}
           </div>
         </section>
@@ -242,7 +305,7 @@ export default function HomePage() {
                 key={item.id}
                 ref={index === items.length - 1 ? lastItemRef : null}
               >
-                <ItemCard item={item} />
+                <ItemCard item={item} index={index} />
               </div>
             ))}
           </div>
@@ -278,16 +341,39 @@ export default function HomePage() {
             ✅ Recently Returned
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {returned.slice(0, 4).map(item => (
-              <ItemCard key={item.id} item={item} />
+            {returned.slice(0, 4).map((item, index) => (
+              <ItemCard key={item.id} item={item} index={index} />
             ))}
           </div>
         </section>
       )}
 
+      {/* Testimonials */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold font-display text-slate-900 dark:text-white">Happy Reunions</h2>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            { name: 'Sarah M.', item: 'Lost Keys', text: 'I found my keys within hours! The AI matched them perfectly.', rating: '⭐⭐⭐⭐⭐' },
+            { name: 'David L.', item: 'Found Laptop', text: 'Super easy to upload what I found. The owner contacted me next day.', rating: '⭐⭐⭐⭐⭐' },
+            { name: 'Emma K.', item: 'Lost Wallet', text: 'A lifesaver! Someone found my wallet and the visual search worked like magic.', rating: '⭐⭐⭐⭐⭐' },
+          ].map((t, i) => (
+            <motion.div key={t.name} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="glass-card p-6">
+              <div className="text-sm mb-4">{t.rating}</div>
+              <p className="text-slate-700 dark:text-slate-300 italic mb-4">"{t.text}"</p>
+              <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
+                <span className="font-semibold text-slate-900 dark:text-white text-sm">{t.name}</span>
+                <span className="text-xs text-primary-500 font-medium">{t.item}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-        <div className="glass-card p-8 sm:p-12 text-center relative overflow-hidden">
+        <div className="glass-card p-8 sm:p-12 text-center relative overflow-hidden gradient-border-card">
           <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-purple-500/5" />
           <div className="relative">
             <h2 className="text-2xl sm:text-3xl font-bold font-display text-slate-900 dark:text-white mb-4">

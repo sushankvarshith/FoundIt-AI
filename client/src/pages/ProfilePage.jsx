@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { HiOutlineCamera, HiOutlinePencil, HiOutlineLockClosed, HiOutlineSun, HiOutlineMoon, HiOutlineUpload, HiOutlineCheckCircle, HiOutlineHeart } from 'react-icons/hi';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -9,6 +9,36 @@ import Input from '../components/ui/Input';
 import Modal from '../components/ui/Modal';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
+
+function AnimatedNumber({ value }) {
+  const nodeRef = useRef(null);
+  const isInView = useInView(nodeRef, { once: true });
+  
+  useEffect(() => {
+    if (!isInView || !nodeRef.current) return;
+    const numericValue = typeof value === 'number' ? value : parseInt(String(value).replace(/[^0-9]/g, ''));
+    if (isNaN(numericValue)) {
+      nodeRef.current.textContent = value;
+      return;
+    }
+    const suffix = String(value).replace(/[0-9]/g, '');
+    let startTime;
+    const duration = 1500;
+    
+    const updateCount = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      if (nodeRef.current) {
+        nodeRef.current.textContent = Math.floor(ease * numericValue) + suffix;
+      }
+      if (progress < 1) requestAnimationFrame(updateCount);
+    };
+    requestAnimationFrame(updateCount);
+  }, [value, isInView]);
+  
+  return <span ref={nodeRef}>0</span>;
+}
 
 export default function ProfilePage() {
   const { user, updateUser, fetchUser } = useAuth();
@@ -128,7 +158,9 @@ export default function ProfilePage() {
               className="glass-card p-5 text-center"
             >
               <div className="flex justify-center mb-2">{stat.icon}</div>
-              <div className="text-2xl font-bold text-slate-900 dark:text-white">{stat.value}</div>
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                <AnimatedNumber value={stat.value} />
+              </div>
               <div className="text-xs text-slate-500">{stat.label}</div>
             </motion.div>
           ))}
@@ -160,6 +192,20 @@ export default function ProfilePage() {
             <div className={`w-12 h-7 rounded-full p-1 transition-colors ${isDark ? 'bg-primary-500' : 'bg-slate-300'}`}>
               <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${isDark ? 'translate-x-5' : ''}`} />
             </div>
+          </button>
+        </div>
+
+        {/* Danger Zone */}
+        <div className="mt-10 p-6 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/50 dark:bg-rose-900/10">
+          <h3 className="text-lg font-bold text-rose-600 dark:text-rose-400 mb-2">Danger Zone</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            Once you delete your account, there is no going back. Please be certain.
+          </p>
+          <button 
+            onClick={() => toast.error('Account deletion is disabled in the demo')}
+            className="px-4 py-2 bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-800 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg text-sm font-medium transition-colors"
+          >
+            Delete Account
           </button>
         </div>
       </motion.div>

@@ -45,13 +45,11 @@ export const createItem = async (req, res) => {
 
         // Generate embedding for each image (async, don't block)
         generateEmbedding(file.buffer)
-          .then(embedding => storeEmbedding(item.id, imgResult.rows[0].id, embedding))
-          .then(() => {
-            // Run auto-match after embedding is stored
+          .then(embedding => {
+            storeEmbedding(item.id, imgResult.rows[0].id, embedding);
+            // Run auto-match after primary image embedding is stored (reuse same embedding)
             if (i === 0) {
-              generateEmbedding(file.buffer).then(emb =>
-                runAutoMatch(emb, item.id, item.title, req.user.id)
-              );
+              runAutoMatch(embedding, item.id, item.title, req.user.id);
             }
           })
           .catch(err => console.error('Embedding generation error:', err));
@@ -138,6 +136,20 @@ export const getItems = async (req, res) => {
 
     const userId = req.user?.id || null;
 
+    // Build user-specific subqueries with parameterized values
+    let userLikedClause = 'false as is_liked,';
+    let userBookmarkedClause = 'false as is_bookmarked';
+    if (userId) {
+      paramCount++;
+      const userIdParam1 = paramCount;
+      params.push(userId);
+      paramCount++;
+      const userIdParam2 = paramCount;
+      params.push(userId);
+      userLikedClause = `(SELECT EXISTS(SELECT 1 FROM likes WHERE item_id = i.id AND user_id = $${userIdParam1})) as is_liked,`;
+      userBookmarkedClause = `(SELECT EXISTS(SELECT 1 FROM bookmarks WHERE item_id = i.id AND user_id = $${userIdParam2})) as is_bookmarked`;
+    }
+
     const result = await query(
       `SELECT
         i.*,
@@ -149,8 +161,8 @@ export const getItems = async (req, res) => {
         (SELECT COUNT(*) FROM likes WHERE item_id = i.id) as likes_count,
         (SELECT COUNT(*) FROM comments WHERE item_id = i.id) as comments_count,
         (SELECT COUNT(*) FROM shares WHERE item_id = i.id) as shares_count,
-        ${userId ? `(SELECT EXISTS(SELECT 1 FROM likes WHERE item_id = i.id AND user_id = '${userId}')) as is_liked,` : 'false as is_liked,'}
-        ${userId ? `(SELECT EXISTS(SELECT 1 FROM bookmarks WHERE item_id = i.id AND user_id = '${userId}')) as is_bookmarked` : 'false as is_bookmarked'}
+        ${userLikedClause}
+        ${userBookmarkedClause}
        FROM items i
        JOIN users u ON i.user_id = u.id
        WHERE ${whereClause}
@@ -178,6 +190,12 @@ export const getItems = async (req, res) => {
 export const getTrending = async (req, res) => {
   try {
     const userId = req.user?.id || null;
+    const params = [];
+    let userLikedClause = 'false as is_liked';
+    if (userId) {
+      params.push(userId);
+      userLikedClause = `(SELECT EXISTS(SELECT 1 FROM likes WHERE item_id = i.id AND user_id = $1)) as is_liked`;
+    }
     const result = await query(
       `SELECT
         i.*,
@@ -186,12 +204,13 @@ export const getTrending = async (req, res) => {
         (SELECT image_url FROM item_images WHERE item_id = i.id AND is_primary = true LIMIT 1) as primary_image,
         (SELECT COUNT(*) FROM likes WHERE item_id = i.id) as likes_count,
         (SELECT COUNT(*) FROM comments WHERE item_id = i.id) as comments_count,
-        ${userId ? `(SELECT EXISTS(SELECT 1 FROM likes WHERE item_id = i.id AND user_id = '${userId}')) as is_liked` : 'false as is_liked'}
+        ${userLikedClause}
        FROM items i
        JOIN users u ON i.user_id = u.id
        WHERE i.status = 'found' AND i.created_at > NOW() - INTERVAL '7 days'
        ORDER BY i.views_count DESC, (SELECT COUNT(*) FROM likes WHERE item_id = i.id) DESC
-       LIMIT 10`
+       LIMIT 10`,
+      params
     );
 
     res.json(result.rows);
@@ -230,6 +249,18 @@ export const getItem = async (req, res) => {
     // Increment views
     await query('UPDATE items SET views_count = views_count + 1 WHERE id = $1', [id]);
 
+    const params = [id];
+    let userLikedClause = 'false as is_liked,';
+    let userBookmarkedClause = 'false as is_bookmarked';
+    if (userId) {
+      params.push(userId);
+      const uidParam1 = params.length;
+      params.push(userId);
+      const uidParam2 = params.length;
+      userLikedClause = `(SELECT EXISTS(SELECT 1 FROM likes WHERE item_id = i.id AND user_id = $${uidParam1})) as is_liked,`;
+      userBookmarkedClause = `(SELECT EXISTS(SELECT 1 FROM bookmarks WHERE item_id = i.id AND user_id = $${uidParam2})) as is_bookmarked`;
+    }
+
     const result = await query(
       `SELECT
         i.*,
@@ -243,12 +274,12 @@ export const getItem = async (req, res) => {
         (SELECT COUNT(*) FROM comments WHERE item_id = i.id) as comments_count,
         (SELECT COUNT(*) FROM shares WHERE item_id = i.id) as shares_count,
         (SELECT COUNT(*) FROM claim_requests WHERE item_id = i.id) as claims_count,
-        ${userId ? `(SELECT EXISTS(SELECT 1 FROM likes WHERE item_id = i.id AND user_id = '${userId}')) as is_liked,` : 'false as is_liked,'}
-        ${userId ? `(SELECT EXISTS(SELECT 1 FROM bookmarks WHERE item_id = i.id AND user_id = '${userId}')) as is_bookmarked` : 'false as is_bookmarked'}
+        ${userLikedClause}
+        ${userBookmarkedClause}
        FROM items i
        JOIN users u ON i.user_id = u.id
        WHERE i.id = $1`,
-      [id]
+      params
     );
 
     if (result.rows.length === 0) {
@@ -418,9 +449,7 @@ export const getUserItems = async (req, res) => {
         (SELECT COUNT(*) FROM likes WHERE item_id = i.id) as likes_count,
         (SELECT COUNT(*) FROM comments WHERE item_id = i.id) as comments_count,
         (SELECT COUNT(*) FROM shares WHERE item_id = i.id) as shares_count,
-        (SELECT COUNT(*) FROM claim_requests WHERE item_id = i.id) as claims_count,
-        (SELECT COUNT(*) FROM embeddings e2 JOIN embeddings e3 ON 1 - (e2.embedding <=> e3.embedding) > 0.8
-         WHERE e2.item_id = i.id AND e3.item_id != i.id) as search_matches
+        (SELECT COUNT(*) FROM claim_requests WHERE item_id = i.id) as claims_count
        FROM items i
        WHERE ${whereClause}
        ORDER BY i.created_at DESC

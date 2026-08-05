@@ -16,10 +16,14 @@ export function AuthProvider({ children }) {
     try {
       const res = await api.get('/auth/me');
       setUser(res.data);
-    } catch {
-      localStorage.removeItem('findit_token');
-      setToken(null);
-      setUser(null);
+    } catch (err) {
+      // Only clear token on auth errors (401/403), not network errors
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        localStorage.removeItem('findit_token');
+        setToken(null);
+        setUser(null);
+      }
+      // For network errors, keep the current state and let user retry
     } finally {
       setLoading(false);
     }

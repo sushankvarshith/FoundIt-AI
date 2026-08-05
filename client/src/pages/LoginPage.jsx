@@ -54,9 +54,18 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary-500/30">
-                F
-              </div>
+              <motion.div 
+                animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-primary-500/40 relative"
+              >
+                <motion.div
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute inset-0 bg-white/20 rounded-xl"
+                />
+                <span className="relative z-10">F</span>
+              </motion.div>
             </Link>
             <h1 className="text-2xl font-bold font-display text-slate-900 dark:text-white mb-2">
               Welcome Back

@@ -1,12 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { HiOutlinePaperAirplane } from 'react-icons/hi';
+import { HiOutlinePaperAirplane, HiOutlineArrowLeft } from 'react-icons/hi';
 import { messageService } from '../services/services';
 import { useAuth } from '../context/AuthContext';
 import EmptyState from '../components/ui/EmptyState';
 import Skeleton from '../components/ui/Skeleton';
-import { format } from 'date-fns';
+import { format, isToday, isYesterday } from 'date-fns';
+
+const formatMessageTime = (dateStr) => {
+  const date = new Date(dateStr);
+  if (isToday(date)) return format(date, 'h:mm a');
+  if (isYesterday(date)) return `Yesterday, ${format(date, 'h:mm a')}`;
+  return format(date, 'MMM d, h:mm a');
+};
 
 export default function MessagesPage() {
   const { user } = useAuth();
@@ -60,9 +67,9 @@ export default function MessagesPage() {
         <h1 className="text-3xl font-bold font-display text-slate-900 dark:text-white mb-6">💬 Messages</h1>
 
         <div className="glass-card overflow-hidden" style={{ height: '70vh' }}>
-          <div className="flex h-full">
+          <div className="flex h-full relative">
             {/* Conversation List */}
-            <div className="w-full sm:w-80 border-r border-slate-200 dark:border-slate-700 overflow-y-auto">
+            <div className={`w-full sm:w-80 border-r border-slate-200 dark:border-slate-700 overflow-y-auto ${activeUserId ? 'hidden sm:block' : 'block'}`}>
               {loading ? (
                 <div className="p-4 space-y-3"><Skeleton variant="card" className="h-16" count={4} /></div>
               ) : conversations.length > 0 ? (
@@ -100,11 +107,17 @@ export default function MessagesPage() {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 flex flex-col hidden sm:flex">
+            <div className={`flex-1 flex flex-col ${!activeUserId ? 'hidden sm:flex' : 'flex'} absolute inset-0 sm:relative sm:inset-auto bg-white dark:bg-[#0b1120]`}>
               {activeUserId ? (
                 <>
                   {/* Chat Header */}
                   <div className="px-6 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                    <button 
+                      onClick={() => setActiveUserId(null)} 
+                      className="sm:hidden p-2 -ml-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      <HiOutlineArrowLeft size={20} />
+                    </button>
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 to-purple-400 flex items-center justify-center text-white font-bold text-sm">
                       {activeConv?.other_user_name?.charAt(0).toUpperCase() || '?'}
                     </div>
@@ -121,8 +134,8 @@ export default function MessagesPage() {
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-bl-md'
                         }`}>
                           <p>{msg.content}</p>
-                          <p className={`text-xs mt-1 ${msg.sender_id === user.id ? 'text-white/60' : 'text-slate-400'}`}>
-                            {format(new Date(msg.created_at), 'h:mm a')}
+                          <p className={`text-[10px] mt-1 text-right ${msg.sender_id === user.id ? 'text-white/70' : 'text-slate-400'}`}>
+                            {formatMessageTime(msg.created_at)}
                           </p>
                         </div>
                       </div>

@@ -86,8 +86,13 @@ const clientDist = path.join(__dirname, '..', 'client', 'dist');
 app.use(express.static(clientDist));
 
 // All non-API routes → React app (SPA fallback)
-app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(clientDist, 'index.html'));
+app.get(/^\/(?!api).*/, (req, res, next) => {
+  // Only serve HTML for requests that accept HTML (not WebSocket upgrades or other types)
+  if (req.accepts('html')) {
+    res.sendFile(path.join(clientDist, 'index.html'));
+  } else {
+    next();
+  }
 });
 
 // Global error handler

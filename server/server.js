@@ -77,4 +77,36 @@ server.listen(PORT, () => {
   });
 });
 
+// ======================
+// CRASH HANDLERS
+// ======================
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('⚠️ Unhandled Promise Rejection:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('🚨 Uncaught Exception:', error);
+  // Give the server time to finish pending requests, then exit
+  setTimeout(() => process.exit(1), 1000);
+});
+
+// ======================
+// GRACEFUL SHUTDOWN
+// ======================
+const gracefulShutdown = (signal) => {
+  console.log(`\n📴 ${signal} received. Shutting down gracefully...`);
+  server.close(() => {
+    console.log('✅ HTTP server closed.');
+    process.exit(0);
+  });
+  // Force close after 10s
+  setTimeout(() => {
+    console.error('⚠️ Forced shutdown after timeout.');
+    process.exit(1);
+  }, 10000);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
 export default server;

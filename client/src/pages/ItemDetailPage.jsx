@@ -33,7 +33,6 @@ export default function ItemDetailPage() {
   const [reportOpen, setReportOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
   const [qrData, setQrData] = useState(null);
-  const [similarItems, setSimilarItems] = useState([]);
 
   useEffect(() => {
     fetchItem();
@@ -147,6 +146,15 @@ export default function ItemDetailPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Breadcrumb */}
+      <div className="text-sm text-slate-500 mb-6 flex items-center gap-2">
+        <Link to="/" className="hover:text-primary-500 transition-colors">Home</Link>
+        <span>›</span>
+        <Link to="/" className="hover:text-primary-500 transition-colors">Items</Link>
+        <span>›</span>
+        <span className="text-slate-900 dark:text-slate-300 font-medium truncate max-w-[200px] sm:max-w-md">{item.title}</span>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* Left - Images */}
         <div className="lg:col-span-3 space-y-4">

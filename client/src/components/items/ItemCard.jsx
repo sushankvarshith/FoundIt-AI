@@ -10,12 +10,13 @@ import ShareModal from '../share/ShareModal';
 import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
 
-export default function ItemCard({ item, onUpdate, similarity }) {
+export default function ItemCard({ item, onUpdate, similarity, index = 0 }) {
   const { user } = useAuth();
   const [liked, setLiked] = useState(item.is_liked === true || item.is_liked === 'true');
   const [likesCount, setLikesCount] = useState(parseInt(item.likes_count || 0));
   const [bookmarked, setBookmarked] = useState(item.is_bookmarked === true || item.is_bookmarked === 'true');
   const [shareOpen, setShareOpen] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const handleLike = async (e) => {
     e.preventDefault();
@@ -53,16 +54,18 @@ export default function ItemCard({ item, onUpdate, similarity }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         whileHover={{ y: -6 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.3, delay: index * 0.1 }}
         className="glass-card overflow-hidden group cursor-pointer"
       >
         <Link to={`/items/${item.id}`}>
           {/* Image */}
-          <div className="relative aspect-[4/3] overflow-hidden">
+          <div className="relative aspect-[4/3] overflow-hidden bg-slate-200 dark:bg-slate-800">
+            {!imgLoaded && <div className="absolute inset-0 skeleton" />}
             <img
               src={primaryImage}
               alt={item.title}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              onLoad={() => setImgLoaded(true)}
+              className={`w-full h-full object-cover group-hover:scale-110 transition-all duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
               loading="lazy"
             />
 
@@ -76,7 +79,7 @@ export default function ItemCard({ item, onUpdate, similarity }) {
 
             {/* Similarity badge */}
             {similarity && (
-              <div className="absolute top-3 right-3">
+              <div className="absolute top-3 right-3 z-10">
                 <SimilarityBadge percentage={similarity} />
               </div>
             )}
@@ -84,8 +87,7 @@ export default function ItemCard({ item, onUpdate, similarity }) {
             {/* Bookmark */}
             <button
               onClick={handleBookmark}
-              className="absolute top-3 right-3 p-2 rounded-xl bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all opacity-0 group-hover:opacity-100"
-              style={similarity ? { top: '3.5rem' } : {}}
+              className={`absolute right-3 p-2 rounded-xl bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all opacity-0 group-hover:opacity-100 z-10 ${similarity ? 'top-12' : 'top-3'}`}
             >
               {bookmarked ? <HiBookmark size={18} /> : <HiOutlineBookmark size={18} />}
             </button>

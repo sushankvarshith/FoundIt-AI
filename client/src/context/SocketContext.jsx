@@ -1,21 +1,23 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
 const SocketContext = createContext(null);
 
 export function SocketProvider({ children }) {
-  const [socket, setSocket] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const { token, user } = useAuth();
+  const socketRef = useRef(null);
 
   useEffect(() => {
+    // Clean up any existing socket
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
+
     if (!token || !user) {
-      if (socket) {
-        socket.disconnect();
-        setSocket(null);
-      }
       return;
     }
 
@@ -23,6 +25,8 @@ export function SocketProvider({ children }) {
     const newSocket = io(socketUrl, {
       auth: { token },
       transports: ['websocket', 'polling'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
     });
 
     newSocket.on('connect', () => {
@@ -34,22 +38,27 @@ export function SocketProvider({ children }) {
       setUnreadCount(prev => prev + 1);
     });
 
-    newSocket.on('disconnect', () => {
-      console.log('🔌 Socket disconnected');
+    newSocket.on('connect_error', (err) => {
+      console.warn('🔌 Socket connection error:', err.message);
     });
 
-    setSocket(newSocket);
+    newSocket.on('disconnect', (reason) => {
+      console.log('🔌 Socket disconnected:', reason);
+    });
+
+    socketRef.current = newSocket;
 
     return () => {
       newSocket.disconnect();
+      socketRef.current = null;
     };
   }, [token, user]);
 
-  const clearUnread = () => setUnreadCount(0);
+  const clearUnread = useCallback(() => setUnreadCount(0), []);
 
   return (
     <SocketContext.Provider value={{
-      socket, notifications, setNotifications, unreadCount, setUnreadCount, clearUnread
+      socket: socketRef.current, notifications, setNotifications, unreadCount, setUnreadCount, clearUnread
     }}>
       {children}
     </SocketContext.Provider>

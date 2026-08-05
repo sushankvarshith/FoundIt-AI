@@ -48,9 +48,9 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-slate-900 dark:text-white mb-3 text-sm uppercase tracking-wider">Help</h4>
             <ul className="space-y-2">
-              {['How it Works', 'Safety Tips', 'Contact Us'].map(label => (
-                <li key={label}>
-                  <span className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-500 transition-colors cursor-pointer">{label}</span>
+              {[{label: 'How it Works', to: '/'}, {label: 'Safety Tips', to: '/'}, {label: 'Contact Us', to: '/'}].map(item => (
+                <li key={item.label}>
+                  <Link to={item.to} className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-500 transition-colors cursor-pointer">{item.label}</Link>
                 </li>
               ))}
             </ul>

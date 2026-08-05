@@ -11,7 +11,13 @@ export const imageSearch = async (req, res) => {
     console.log('🔍 Processing image search...');
 
     // Generate embedding for the uploaded search image
-    const embedding = await generateEmbedding(req.file.buffer);
+    let embedding;
+    try {
+      embedding = await generateEmbedding(req.file.buffer);
+    } catch (modelError) {
+      console.error('AI model error:', modelError);
+      return res.status(503).json({ error: 'AI search model is still loading. Please try again in a few seconds.' });
+    }
 
     // Find top 20 similar items
     const results = await findSimilarItems(embedding, 20);
