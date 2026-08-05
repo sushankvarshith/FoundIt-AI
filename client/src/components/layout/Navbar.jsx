@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiOutlineSearch, HiOutlineBell, HiOutlinePlus, HiOutlineMenu, HiOutlineX, HiOutlineSun, HiOutlineMoon, HiOutlineUser, HiOutlineLogout, HiOutlineCollection, HiOutlineBookmark, HiOutlineChatAlt2, HiOutlineClipboardList, HiOutlineCog } from 'react-icons/hi';
