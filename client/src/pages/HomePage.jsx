@@ -106,24 +106,24 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="gradient-bg-animated min-h-[60vh] flex items-center">
+      <section className="relative overflow-hidden bg-primary-900">
+        <div className="gradient-bg-animated min-h-[70vh] flex flex-col items-center justify-center pt-24 pb-40">
           {/* Dot pattern overlay */}
-          <div className="absolute inset-0 dot-pattern opacity-30" />
+          <div className="absolute inset-0 dot-pattern opacity-30 pointer-events-none" />
 
           {/* Floating shapes */}
           <motion.div
             animate={{ y: [0, -30, 0], rotate: [0, 5, 0] }}
             transition={{ duration: 8, repeat: Infinity }}
-            className="absolute top-20 left-10 w-20 h-20 rounded-2xl bg-white/10 blur-sm hidden lg:block"
+            className="absolute top-20 left-10 w-20 h-20 rounded-2xl bg-white/10 blur-sm hidden lg:block pointer-events-none"
           />
           <motion.div
             animate={{ y: [0, 20, 0], rotate: [0, -5, 0] }}
             transition={{ duration: 6, repeat: Infinity }}
-            className="absolute bottom-20 right-20 w-32 h-32 rounded-full bg-white/10 blur-sm hidden lg:block"
+            className="absolute bottom-32 right-20 w-32 h-32 rounded-full bg-white/10 blur-sm hidden lg:block pointer-events-none"
           />
 
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full z-10">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -204,15 +204,15 @@ export default function HomePage() {
         </div>
 
         {/* Curved bottom */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 80" className="w-full h-auto fill-slate-50 dark:fill-[#0b1120]">
+        <div className="absolute bottom-0 left-0 right-0 w-full leading-none pointer-events-none z-0">
+          <svg viewBox="0 0 1440 80" className="w-full block h-auto fill-slate-50 dark:fill-[#0b1120]">
             <path d="M0,64 C480,0 960,0 1440,64 L1440,80 L0,80 Z" />
           </svg>
         </div>
       </section>
 
       {/* How it works */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 -mt-12 relative z-10">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 -mt-16 lg:-mt-24 relative z-10">
         <div className="grid md:grid-cols-3 gap-8">
           {[
             { icon: '📸', title: 'Snap a Photo', desc: 'Take a picture of the item you found or the one you lost.' },

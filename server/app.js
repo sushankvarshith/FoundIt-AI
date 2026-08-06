@@ -21,6 +21,9 @@ import adminRoutes from './routes/admin.js';
 
 const app = express();
 
+// Trust reverse proxy (needed for Render)
+app.set('trust proxy', 1);
+
 // ======================
 // MIDDLEWARE
 // ======================
