@@ -212,7 +212,7 @@ export default function ItemDetailPage() {
                       onChange={(e) => setNewComment(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleComment()}
                       placeholder="Write a comment..."
-                      className="flex-1 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-slate-900 dark:text-white"
+                      className="flex-1 px-4 py-2.5 rounded-xl glass-input text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50"
                     />
                     <Button size="sm" onClick={handleComment}>Send</Button>
                   </div>
@@ -339,17 +339,17 @@ export default function ItemDetailPage() {
 
             <div className="space-y-2">
               {item.phone && !item.hide_contact && (
-                <a href={`tel:${item.phone}`} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition-colors text-sm font-medium">
+                <a href={`tel:${item.phone}`} className="flex items-center gap-3 px-4 py-3 rounded-xl glass border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-300 transition-colors text-sm font-medium">
                   <HiOutlinePhone size={18} /> {item.phone}
                 </a>
               )}
               {item.email && !item.hide_contact && (
-                <a href={`mailto:${item.email}`} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 hover:bg-blue-100 transition-colors text-sm font-medium">
+                <a href={`mailto:${item.email}`} className="flex items-center gap-3 px-4 py-3 rounded-xl glass border-blue-500/30 hover:bg-blue-500/20 text-blue-300 transition-colors text-sm font-medium">
                   <HiOutlineMail size={18} /> {item.email}
                 </a>
               )}
               {item.phone && !item.hide_contact && (
-                <a href={`https://wa.me/${item.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 hover:bg-green-100 transition-colors text-sm font-medium">
+                <a href={`https://wa.me/${item.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 rounded-xl glass border-green-500/30 hover:bg-green-500/20 text-green-300 transition-colors text-sm font-medium">
                   💬 WhatsApp
                 </a>
               )}
@@ -382,7 +382,7 @@ export default function ItemDetailPage() {
           <Input label="Reason *" placeholder="e.g., I lost my black wallet at Central Park on Friday" value={claimForm.reason} onChange={(e) => setClaimForm({ ...claimForm, reason: e.target.value })} />
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Additional Details</label>
-            <textarea rows={3} className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-slate-900 dark:text-white resize-none" placeholder="Any additional information..." value={claimForm.description} onChange={(e) => setClaimForm({ ...claimForm, description: e.target.value })} />
+            <textarea rows={3} className="w-full px-4 py-3 rounded-xl glass-input text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 resize-none" placeholder="Any additional information..." value={claimForm.description} onChange={(e) => setClaimForm({ ...claimForm, description: e.target.value })} />
           </div>
           <Button variant="gradient" className="w-full" onClick={handleClaim}>Submit Claim</Button>
         </div>
@@ -391,7 +391,7 @@ export default function ItemDetailPage() {
       <Modal isOpen={reportOpen} onClose={() => setReportOpen(false)} title="Report Item" size="sm">
         <div className="space-y-2">
           {['Fake listing', 'Inappropriate content', 'Scam', 'Duplicate', 'Other'].map(reason => (
-            <button key={reason} onClick={() => handleReport(reason)} className="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-sm text-slate-700 dark:text-slate-300 transition-colors">
+            <button key={reason} onClick={() => handleReport(reason)} className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 text-sm text-slate-200 transition-colors">
               {reason}
             </button>
           ))}

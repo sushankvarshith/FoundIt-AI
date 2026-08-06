@@ -104,8 +104,8 @@ export default function RegisterPage() {
                 error={errors.password}
               />
               {form.password && (
-                <div className="mt-3 space-y-2 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Password Requirements:</p>
+                <div className="mt-3 space-y-2 p-3 glass bg-white/5 rounded-xl border border-white/10">
+                  <p className="text-xs font-semibold text-slate-300 mb-2">Password Requirements:</p>
                   {passwordReqs.map((req, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs">
                       {req.met ? (

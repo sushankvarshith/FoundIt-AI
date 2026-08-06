@@ -24,13 +24,7 @@ const Input = forwardRef(({
           ref={ref}
           type={isPassword && showPassword ? 'text' : type}
           className={`
-            w-full px-4 py-3 rounded-xl
-            bg-white dark:bg-slate-800/50
-            border border-slate-200 dark:border-slate-700
-            text-slate-900 dark:text-white
-            placeholder-slate-400 dark:placeholder-slate-500
-            focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500
-            transition-all duration-200
+            w-full px-4 py-3 glass-input
             ${icon ? 'pl-11' : ''}
             ${isPassword ? 'pr-11' : ''}
             ${error ? 'border-rose-400 focus:ring-rose-500/50 focus:border-rose-500' : ''}

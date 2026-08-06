@@ -106,8 +106,8 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-primary-900">
-        <div className="gradient-bg-animated min-h-[70vh] flex flex-col items-center justify-center pt-24 pb-40">
+      <section className="relative overflow-hidden">
+        <div className="min-h-[70vh] flex flex-col items-center justify-center pt-24 pb-40">
           {/* Dot pattern overlay */}
           <div className="absolute inset-0 dot-pattern opacity-30 pointer-events-none" />
 
@@ -205,7 +205,7 @@ export default function HomePage() {
 
         {/* Curved bottom */}
         <div className="absolute bottom-0 left-0 right-0 w-full leading-none pointer-events-none z-0">
-          <svg viewBox="0 0 1440 80" className="w-full block h-auto fill-slate-50 dark:fill-[#0b1120]">
+          <svg viewBox="0 0 1440 80" className="w-full block h-auto fill-transparent">
             <path d="M0,64 C480,0 960,0 1440,64 L1440,80 L0,80 Z" />
           </svg>
         </div>
@@ -242,8 +242,8 @@ export default function HomePage() {
             onClick={() => setActiveCategory('')}
             className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 ${
               !activeCategory
-                ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25'
-                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                ? 'glass bg-primary-500/50 text-white shadow-lg border-primary-400'
+                : 'glass text-slate-200 hover:bg-white/10'
             }`}
           >
             <span>✨</span> All Items
@@ -254,8 +254,8 @@ export default function HomePage() {
               onClick={() => setActiveCategory(cat.name)}
               className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 btn-ripple ${
                 activeCategory === cat.name
-                  ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25'
-                  : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                  ? 'glass bg-primary-500/50 text-white shadow-lg border-primary-400'
+                  : 'glass text-slate-200 hover:bg-white/10'
               }`}
             >
               <span>{cat.icon}</span> {cat.name}

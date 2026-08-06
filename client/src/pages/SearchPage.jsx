@@ -108,8 +108,8 @@ export default function SearchPage() {
           onClick={() => setMode('image')}
           className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
             mode === 'image'
-              ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25'
-              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+              ? 'glass bg-primary-500/50 text-white shadow-lg border-primary-400'
+              : 'glass text-slate-200 hover:bg-white/10'
           }`}
         >
           <span className="mr-2">📷</span> Image Search
@@ -118,8 +118,8 @@ export default function SearchPage() {
           onClick={() => setMode('text')}
           className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
             mode === 'text'
-              ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25'
-              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+              ? 'glass bg-primary-500/50 text-white shadow-lg border-primary-400'
+              : 'glass text-slate-200 hover:bg-white/10'
           }`}
         >
           <span className="mr-2">🔤</span> Text Search
@@ -135,8 +135,8 @@ export default function SearchPage() {
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all ${
                   isDragActive
-                    ? 'border-primary-400 bg-primary-50/50 dark:bg-primary-900/20'
-                    : 'border-slate-300 dark:border-slate-600 hover:border-primary-400 hover:bg-primary-50/30 dark:hover:bg-primary-900/10'
+                    ? 'border-primary-400 bg-primary-500/20'
+                    : 'border-white/20 hover:border-primary-400 hover:bg-white/10'
                 }`}
               >
                 <input {...getInputProps()} />
@@ -150,7 +150,7 @@ export default function SearchPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center min-h-[200px] max-h-[400px] border border-slate-200 dark:border-slate-800">
+                <div className="relative rounded-2xl overflow-hidden glass bg-black/30 flex items-center justify-center min-h-[200px] max-h-[400px] border border-white/10">
                   <img src={preview} alt="Search" className="max-w-full max-h-[400px] object-contain" />
                   
                   {loading && (
@@ -219,7 +219,7 @@ export default function SearchPage() {
                 >
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     <select
-                      className="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                      className="px-4 py-2.5 rounded-xl glass-input w-full text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 [&>option]:text-slate-900"
                       value={filters.category}
                       onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                     >
@@ -227,7 +227,7 @@ export default function SearchPage() {
                       {categories.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                     <select
-                      className="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                      className="px-4 py-2.5 rounded-xl glass-input w-full text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 [&>option]:text-slate-900"
                       value={filters.color}
                       onChange={(e) => setFilters({ ...filters, color: e.target.value })}
                     >

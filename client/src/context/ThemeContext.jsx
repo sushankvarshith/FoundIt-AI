@@ -13,8 +13,10 @@ export function ThemeProvider({ children }) {
     const root = document.body;
     if (isDark) {
       root.classList.add('dark');
+      root.classList.remove('light');
     } else {
       root.classList.remove('dark');
+      root.classList.add('light');
     }
     localStorage.setItem('findit_theme', isDark ? 'dark' : 'light');
   }, [isDark]);

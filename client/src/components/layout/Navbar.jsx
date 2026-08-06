@@ -40,7 +40,7 @@ export default function Navbar() {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
       scrolled 
-        ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-700/50 shadow-sm' 
+        ? 'glass shadow-lg border-b border-white/10' 
         : 'bg-transparent border-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -216,7 +216,7 @@ export default function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden border-t border-slate-200/50 dark:border-slate-700/50 overflow-hidden"
           >
-            <div className="px-4 py-4 space-y-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg">
+            <div className="px-4 py-4 space-y-1 glass border-t border-white/10">
               {navLinks.map(link => (
                 (!link.protected || user) && (
                   <Link

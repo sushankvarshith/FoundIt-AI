@@ -2,12 +2,12 @@ import { motion } from 'framer-motion';
 import { forwardRef } from 'react';
 
 const variants = {
-  primary: 'bg-primary-600 hover:bg-primary-700 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40',
-  secondary: 'bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700',
-  ghost: 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300',
-  danger: 'bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/25',
-  accent: 'bg-accent-500 hover:bg-accent-600 text-white shadow-lg shadow-accent-500/25',
-  gradient: 'bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600 text-white shadow-lg shadow-primary-500/25',
+  primary: 'glass-btn bg-primary-600/40 hover:bg-primary-600/60 text-white shadow-lg shadow-primary-500/25',
+  secondary: 'glass-btn bg-white/5 hover:bg-white/15 text-slate-200 border border-white/10',
+  ghost: 'bg-transparent hover:bg-white/10 text-slate-200',
+  danger: 'glass-btn bg-rose-500/40 hover:bg-rose-500/60 text-white shadow-lg shadow-rose-500/25',
+  accent: 'glass-btn bg-accent-500/40 hover:bg-accent-500/60 text-white shadow-lg shadow-accent-500/25',
+  gradient: 'bg-gradient-to-r from-primary-500/80 to-purple-500/80 hover:from-primary-600 hover:to-purple-600 text-white shadow-lg shadow-primary-500/25 backdrop-blur-md border border-white/20',
 };
 
 const sizes = {
